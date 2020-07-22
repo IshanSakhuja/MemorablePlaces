@@ -7,7 +7,9 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,14 +28,14 @@ import static com.ishan.memorableplaces.MainActivity.listView;
 import static com.ishan.memorableplaces.MainActivity.locationsCoordinates;
 import static com.ishan.memorableplaces.MainActivity.locationsName;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnKeyListener {
     Intent intent;
     private GoogleMap mMap;
     double latitude;
     double longtitude;
     String title;
     int index;
-    TextView textView;
+    EditText textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,14 +54,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         index = intent.getIntExtra("Index",0);
         if(index == 0) {
             LatLng myLocation = new LatLng(latitude, longtitude);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 13f));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 15f));
             mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                 @Override
                 public void onMapLongClick(LatLng latLng) {
-                    Log.i("Map Long Press", "True");
                     mMap.addMarker(new MarkerOptions().position(latLng).title(getGeoCode(latLng)));
                     updateArrayList(title, latLng);
-                    Toast.makeText(MapsActivity.this, "Location Added", Toast.LENGTH_LONG).show();
                 }
             });
         }else
@@ -76,6 +76,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(addresses == null)
             {
                 textView.setVisibility(View.VISIBLE);
+                textView.setOnKeyListener(this);
             }else
             {
                 title += addresses.get(0).getSubThoroughfare();
@@ -86,7 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(title == null)
                 {
                     textView.setVisibility(View.VISIBLE);
-                    //Making a commit
+                    textView.setOnKeyListener(this);
                 }
             }
         }catch(Exception ex)
@@ -100,5 +101,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationsName.add(title);
         locationsCoordinates.add(latLng);
         arrayAdapter.notifyDataSetChanged();
+        Toast.makeText(MapsActivity.this, "Location Added", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean onKey(View view, int i, KeyEvent keyEvent) {
+        if(i == KeyEvent.KEYCODE_ENTER)
+        {
+            EditText editText = (EditText)view;
+            title = editText.getText().toString();
+        }
+        return false;
     }
 }
