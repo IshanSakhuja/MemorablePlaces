@@ -86,7 +86,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(title == null)
                 {
                     textView.setVisibility(View.VISIBLE);
-                    
+                    //Making a commit
                 }
             }
         }catch(Exception ex)
